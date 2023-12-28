@@ -10,7 +10,7 @@ import whisper
 import pyaudio
 import wave
 import serial
-import time
+# import time
 import configparser
 
 
@@ -27,6 +27,7 @@ class setup():
             CDLL(str(Path("/home/cathy/venv/env/onnxruntime-linux-aarch63-1.13.1/lib/libonnxruntime.so").resolve(strict=True)))
             self.config_path = "/home/cathy/projectCathy/env2/config.ini"
             self.open_jtalk_path ="/home/cathy/projectCathy/env2/open_jtalk_dic_utf_8-1.11"
+
  
         elif self.os_name == "windows":
 
@@ -88,18 +89,26 @@ def cathy_Main():
     # google_translation()はソースの言語に併せて翻訳を担当するフレンズ
     maniscript = transletor_transmission.google_translation()
 
-    # 合成音声を生成
+    # 合成音声を生成するフレンズ
     synthetic = tts(maniscript)
-    # 再生時間を取得
+    # 再生時間を取得するフレンズ
     play_time = synthetic.play_time()
-    # 再生
-    synthetic.speaker_zunda()
-    # 再生中M5Stackに信号を送る
-    runtime_serial(play_time)
+
+    for cnt in range(2):
+        if cnt == 0:
+            # 再生中M5Stackに信号を送るフレンズ
+            runtime_serial(play_time, cnt)
+            # 再生するフレンズ
+            synthetic.speaker_zunda()
+        elif cnt == 1:
+            # 再生中M5Stackに信号を送るフレンズ
+            runtime_serial(play_time, cnt)
+    else:
+        print("正常に処理できました")
 
 
 class listen():
-    # 録音とその音声ファイルの生成
+    # 録音とその音声ファイルの生成するフレンズ
 
 
     def __init__(self):
@@ -209,7 +218,7 @@ class tts():
     # text to speech
 
     def __init__(self,ja_text):
-        # 音声つくる
+        # 翻訳したテキストをもとに合成音声を生成
         core = VoicevoxCore(open_jtalk_dict_dir=Path(open_jtalk_path))
         speaker_id = 3
         self.output_path = "speechCathy.wav"
@@ -221,7 +230,7 @@ class tts():
 
 
     def play_time(self):
-        # 再生時間取得
+        # 音声の再生時間を取得
         wf = wave.open(self.output_path, 'rb')# 合成音声ファイルを開く
         samplerate = wf.getframerate()
         frame = wf.getnframes()
@@ -256,22 +265,32 @@ class tts():
 class runtime_serial():
 
 
-        def __init__(self, clock):
+        def __init__(self, clock, cnt):
+            self.cnt = cnt
+            self.clock = clock
             if os_name == "linux":
-                # 信号をESP32に送信
-                # シリアルポートをオープンにする
-                play_signal = "A"
                 ser = serial.Serial('/dev/serial0', 115200, timeout = 1.0)
-                ser.write(play_signal.encode())
-                time.sleep(clock)
-                print(f"{clock}s経過しました")
-                play_signal = "B"
-                ser.write(play_signal.encode())
-                ser.close()
 
             elif os_name =="windows":
-                time.sleep(clock)
-                print(f"{clock}s経過しました")
+                ser ="Null"
+                # time.sleep(clock)
+                # print(f"{clock}s経過しました")
+            
+            serial.signal(self, ser)
+
+
+        def signal(self, ser):
+            if self.cnt == 0:
+                # 信号をESP32に送信
+                play_signal = "A"
+                ser.write(play_signal.encode())
+            elif self.cnt == 1 :
+                print(f"{self.clock}s経過しました")
+                play_signal = "B"
+                ser.write(play_signal.encode())
+                print("再生を終了します")
+                ser.close()
+
 
 
 if __name__ =='__main__':
