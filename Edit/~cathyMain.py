@@ -1,8 +1,36 @@
 from ctypes import CDLL
 from pathlib import Path
 import platform
-import json
-#import onnxruntime
+# 異なるOS間特有の依存関係を排除
+print("toggle debug mode: [on] or [off]")
+debug_mode = input()# デバックモードのON/OFFの切り替え
+os_name = platform.system()
+os_info = platform.platform()
+
+if os_name == "linux":# ubuntu and Rasbian
+    CDLL(str(Path("/home/cathy/venv/env/onnxruntime-linux-aarch63-1.13.1/lib/libonnxruntime.so").resolve(strict=True)))
+    config_path = "/home/cathy/projectCathy/env2/config.ini"
+    open_jtalk_path ="/home/cathy/projectCathy/env2/open_jtalk_dic_utf_8-1.11"
+
+elif os_name == "windows":
+
+    if os_info =="Windows-11-10.0.22621-SP0":# win11
+        CDLL(str(Path("C:/GitHub/projectCathy/env1/main/cathy/Edit/onnxruntime.dll").resolve(strict=True)))
+        config_path = "C:/GitHub/projectCathy/env1/main/config.ini"
+        open_jtalk_path ="C:/GitHub/projectCathy/env1/main/open_jtalk_dic_utf_8-1.11"
+
+    elif os_info=="Windows-11-10.0.17763-SP0":# win10
+        CDLL(str(Path("X:/venv/env/onnxruntime.dll").resolve(strict=True)))
+        config_path = "X:/venv/env/config.ini"
+        open_jtalk_path ="X:/venv/env/open_jtalk_dic_utf_7-1.11"
+
+    else:
+        print("想定外のOSエラー")
+        CDLL(str(Path("onnxruntime.dll").resolve(strict=True)))
+        os_info = "null"
+        config_path = "null"
+        open_jtalk_path = "null"
+
 from googletrans import Translator
 from voicevox_core import VoicevoxCore
 import openai
@@ -10,72 +38,22 @@ import whisper
 import pyaudio
 import wave
 import serial
-# import time
 import configparser
-
-
-class setup():
-
-
-    def __init__(self):
-        # 異なるOS間特有の依存関係を排除
-        print("toggle debug mode: [on] or [off]")
-        self.debug_mode = input()# デバックモードのONOFFの切り替え（onかoffのどちらかのみを入れてね）
-        self.os_name = platform.system()
-        self.os_info = platform.platform()
-        if self.os_name == "linux":
-            CDLL(str(Path("/home/cathy/venv/env/onnxruntime-linux-aarch63-1.13.1/lib/libonnxruntime.so").resolve(strict=True)))
-            self.config_path = "/home/cathy/projectCathy/env2/config.ini"
-            self.open_jtalk_path ="/home/cathy/projectCathy/env2/open_jtalk_dic_utf_8-1.11"
-
- 
-        elif self.os_name == "windows":
-
-            if self.os_info =="Windows-11-10.0.22621-SP0":
-                CDLL(str(Path("C:/GitHub/projectCathy/env1/main/cathy/Edit/onnxruntime.dll").resolve(strict=True)))
-                self.config_path = "C:/GitHub/projectCathy/env1/main/config.ini"
-                self.open_jtalk_path ="C:/GitHub/projectCathy/env1/main/open_jtalk_dic_utf_8-1.11"
-
-            elif self.os_info=="Windows-11-10.0.17763-SP0":
-                CDLL(str(Path("X:/venv/env/onnxruntime.dll").resolve(strict=True)))
-                self.config_path = "X:/venv/env/config.ini"
-                self.open_jtalk_path ="X:/venv/env/open_jtalk_dic_utf_7-1.11"
-
-
-        else:
-            print("想定外のOSエラー")
-
-
-    def data_set(self):
-        dictionary = {
-             "debug_mode" : self.debug_mode,
-             "os_name" : self.os_name,
-             "config_path" : self.config_path,
-             "open_jtalk_path" : self.open_jtalk_path,
-             "os_info" : self.os_info
-        }
-
-        with open('Environmental_setting.json', 'w') as file: # 第二引数：writableオプションを指定
-            json.dump(dictionary, file)
-
-        with open('Environmental_setting.json') as file:
-            settingrc= json.load(file)
-
-        return settingrc
 
 # setupとは別の関数
 def cathy_Main():
     if debug_mode == "off":
-        listen = listen()# 録音に必要な情報を代入
-        listen_wav = listen.jene()# 録音し生成した音声ファイルのPathを取得
+        listen = listen()# 録音に必要な値を設定
+        listen_wav = listen.jene()# 録音した音声ファイルのPathを取得
         dic = char_conver(listen_wav)# 音声ファイルを元に文字起こし
+        # dictationの中身がChatGPTへ送られる
         dictation = dic.result()# 文字起こしした結果を代入
 
     elif debug_mode == "on":
-        dictation = "あなたの名前を教えてください"# 文字起こしした結果を代入
+        dictation = "あなたの名前を教えてください"
 
-    translation = trans(dictation)# 文字起こしした結果から必要な情報だけを抜き取る
-    language_translation = translation.iflanguage()
+    translation = trans(dictation)# dictationの中身をバラして整理して再統合
+    language_translation = translation.iflanguage()# いる？
 
     print("System message : {}へと翻訳 ...".format(language_translation[0]))
     # google_translation()はソースの言語に併せて翻訳を担当するフレンズ
@@ -294,12 +272,4 @@ class runtime_serial():
 
 
 if __name__ =='__main__':
-    begin = setup()
-    # グローバル変数
-    settingrc = begin.data_set()
-    debug_mode = settingrc["debug_mode"]
-    os_name = settingrc["os_name"]
-    os_info = settingrc["os_info"]
-    open_jtalk_path = settingrc["open_jtalk_path"]
-    config_path = settingrc["config_path"]
     cathy_Main()
