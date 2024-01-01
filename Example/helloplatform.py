@@ -1,6 +1,4 @@
 import platform
-import os
-import sys
 
 print(platform.system())
 # Darwin

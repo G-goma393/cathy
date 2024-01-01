@@ -4,6 +4,7 @@ import platform
 # 異なるOS間特有の依存関係を排除
 print("toggle debug mode: [on] or [off]")
 debug_mode = input()# デバックモードのON/OFFの切り替え
+#CDLL(str(Path("C:/GitHub/projectCathy/env2/main/onnxruntime.dll").resolve(strict=True)))
 os_name = platform.system()
 os_info = platform.platform()
 
@@ -12,12 +13,13 @@ if os_name == "linux":# ubuntu and Rasbian
     config_path = "/home/cathy/projectCathy/env2/config.ini"
     open_jtalk_path ="/home/cathy/projectCathy/env2/open_jtalk_dic_utf_8-1.11"
 
-elif os_name == "windows":
+elif os_name == "Windows":
 
-    if os_info =="Windows-11-10.0.22621-SP0":# win11
-        CDLL(str(Path("C:/GitHub/projectCathy/env1/main/cathy/Edit/onnxruntime.dll").resolve(strict=True)))
+    if os_info =="Windows-10-10.0.22621-SP0":# win11
+        CDLL(str(Path("C:/GitHub/projectCathy/env2/main/onnxruntime.dll").resolve(strict=True)))
         config_path = "C:/GitHub/projectCathy/env1/main/config.ini"
         open_jtalk_path ="C:/GitHub/projectCathy/env1/main/open_jtalk_dic_utf_8-1.11"
+        print("読んだ")
 
     elif os_info=="Windows-11-10.0.17763-SP0":# win10
         CDLL(str(Path("X:/venv/env/onnxruntime.dll").resolve(strict=True)))
@@ -42,9 +44,10 @@ import configparser
 
 # setupとは別の関数
 def cathy_Main():
+
     if debug_mode == "off":
-        listen = listen()# 録音に必要な値を設定
-        listen_wav = listen.jene()# 録音した音声ファイルのPathを取得
+        lis = listen()# 録音に必要な値を設定
+        listen_wav = lis.jene()# 録音した音声ファイルのPathを取得
         dic = char_conver(listen_wav)# 音声ファイルを元に文字起こし
         # dictationの中身がChatGPTへ送られる
         dictation = dic.result()# 文字起こしした結果を代入

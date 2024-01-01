@@ -1,17 +1,17 @@
-import os
 from openai import OpenAI
-
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key = os.getenv("OPENA_API_KEY"),
+import configparser
+config = configparser.ConfigParser()
+config.read('C:/GitHub/projectCathy/env2/main/config.ini')
+keybox = config['DEFAULT']['OPENAI_API_KEY']
+client = OpenAI()
+print(client)
+print(config['DEFAULT']['OPENAI_API_KEY'])
+completion = client.chat.completions.create(
+  model="gpt-3.5-turbo",
+  messages=[
+    {"role": "system", "content": "you are a cheerful assistant."},
+    {"role": "user", "content": "aZling4"}
+  ]
 )
 
-chat_completion = client.chat.completions.create(
-    messages=[
-        {
-            "role": "user",
-            "content": "Say this is a test",
-        }
-    ],
-    model="gpt-3.5-turbo",
-)
+print(completion.choices[0].message)
