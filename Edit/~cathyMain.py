@@ -1,12 +1,14 @@
 from ctypes import CDLL
 from pathlib import Path
 import platform
+
 # 異なるOS間特有の依存関係を排除
 print("toggle debug mode: [on] or [off]")
 debug_mode = input()# デバックモードのON/OFFの切り替え
-#CDLL(str(Path("C:/GitHub/projectCathy/env2/main/onnxruntime.dll").resolve(strict=True)))
+
 os_name = platform.system()
 os_info = platform.platform()
+
 
 if os_name == "linux":# ubuntu and Rasbian
     CDLL(str(Path("/home/cathy/venv/env/onnxruntime-linux-aarch63-1.13.1/lib/libonnxruntime.so").resolve(strict=True)))
@@ -19,7 +21,6 @@ elif os_name == "Windows":
         CDLL(str(Path("C:/GitHub/projectCathy/env2/main/onnxruntime.dll").resolve(strict=True)))
         config_path = "C:/GitHub/projectCathy/env1/main/config.ini"
         open_jtalk_path ="C:/GitHub/projectCathy/env1/main/open_jtalk_dic_utf_8-1.11"
-        print("読んだ")
 
     elif os_info=="Windows-11-10.0.17763-SP0":# win10
         CDLL(str(Path("X:/venv/env/onnxruntime.dll").resolve(strict=True)))
@@ -35,12 +36,11 @@ elif os_name == "Windows":
 
 from googletrans import Translator
 from voicevox_core import VoicevoxCore
-import openai
+from openai import OpenAI
 import whisper
 import pyaudio
 import wave
 import serial
-import configparser
 
 # setupとは別の関数
 def cathy_Main():
@@ -93,6 +93,7 @@ class listen():
 
 
     def __init__(self):
+
     # 録音に必要な情報を辞書型に代入
         self.args={
         "CHUNK":1024,
@@ -175,20 +176,19 @@ class send_ai():
 
 
     def __init__(self,content):
-        config = configparser.ConfigParser()
-        config.read(config_path)
+        client = OpenAI()
 
-        openai.api_key = config['DEFAULT']['OPENAI_API_KEY']
-
-        messages = [
-          {"role": "system", "content": "You are a helpful assistant."},
-          {"role": "user", "content": content},
-        ]
-        response = openai.ChatCompletion.create(
+        completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=messages
+        messages=[
+            {"role": "system", "content": "you are a cheerful assistant."},
+            {"role": "user", "content": content}
+        ]
         )
-        self.reply = {"text":response.choices[0].message.content, "language":"en"}
+
+        print(completion.choices[0].message)
+        reply_content = completion.choices[0].message.content
+        self.reply = {"text":reply_content, "language":"en"}
 
 
     def handler(self):
@@ -253,7 +253,7 @@ class runtime_serial():
                 ser = serial.Serial('/dev/serial0', 115200, timeout = 1.0)
 
             elif os_name =="windows":
-                ser ="Null"
+                ser ="null"
                 # time.sleep(clock)
                 # print(f"{clock}s経過しました")
             
