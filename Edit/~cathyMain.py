@@ -20,7 +20,7 @@ elif os_name == "Windows":
     if os_info =="Windows-10-10.0.22621-SP0":# win11
         CDLL(str(Path("C:/GitHub/projectCathy/env2/main/onnxruntime.dll").resolve(strict=True)))
         config_path = "C:/GitHub/projectCathy/env1/main/config.ini"
-        open_jtalk_path ="C:/GitHub/projectCathy/env1/main/open_jtalk_dic_utf_8-1.11"
+        open_jtalk_path ="C:/GitHub/projectCathy/env2/main/open_jtalk_dic_utf_8-1.11"
 
     elif os_info=="Windows-11-10.0.17763-SP0":# win10
         CDLL(str(Path("X:/venv/env/onnxruntime.dll").resolve(strict=True)))
@@ -53,7 +53,10 @@ def cathy_Main():
         dictation = dic.result()# 文字起こしした結果を代入
 
     elif debug_mode == "on":
-        dictation = "あなたの名前を教えてください"
+        dictation = {
+        "text":"あなたの名前を教えてください", 
+        "language":"ja"
+        }
 
     translation = trans(dictation)# dictationの中身をバラして整理して再統合
     language_translation = translation.iflanguage()# いる？
@@ -86,7 +89,6 @@ def cathy_Main():
             runtime_serial(play_time, cnt)
     else:
         print("正常に処理できました")
-
 
 class listen():
     # 録音とその音声ファイルの生成するフレンズ
@@ -240,7 +242,6 @@ class tts():
         stream.close()
         # PyAudioを終了
         p.terminate()
-        print("再生終わりました")
 
 
 class runtime_serial():
@@ -252,25 +253,35 @@ class runtime_serial():
             if os_name == "linux":
                 ser = serial.Serial('/dev/serial0', 115200, timeout = 1.0)
 
-            elif os_name =="windows":
+            elif os_name =="Windows":
                 ser ="null"
                 # time.sleep(clock)
                 # print(f"{clock}s経過しました")
             
-            serial.signal(self, ser)
+            runtime_serial.signal(self, ser)
 
 
         def signal(self, ser):
-            if self.cnt == 0:
-                # 信号をESP32に送信
-                play_signal = "A"
-                ser.write(play_signal.encode())
-            elif self.cnt == 1 :
-                print(f"{self.clock}s経過しました")
-                play_signal = "B"
-                ser.write(play_signal.encode())
-                print("再生を終了します")
-                ser.close()
+            if ser != "null":    
+                if self.cnt == 0:
+                    # 信号をESP32に送信
+                    play_signal = "A"
+                    ser.write(play_signal.encode())
+                elif self.cnt == 1 :
+                    print(f"{self.clock}s経過しました")
+                    play_signal = "B"
+                    ser.write(play_signal.encode())
+                    print("再生を終了します")
+                    ser.close()
+            else:
+                if self.cnt == 0:
+                    play_signal = "A"
+                    print("【デバック】Aシグナルを送信した体。再生を開始します")
+                elif self.cnt == 1 :
+                    print(f"【デバック】{self.clock}s経過しました")
+                    play_signal = "B"
+                    print("【デバック】Bシグナルを送信した体。再生を終了します")
+
 
 
 
