@@ -10,28 +10,24 @@ os_name = platform.system()
 os_info = platform.platform()
 
 
-if os_name == "linux":# ubuntu and Rasbian
-    CDLL(str(Path("/home/cathy/venv/env/onnxruntime-linux-aarch63-1.13.1/lib/libonnxruntime.so").resolve(strict=True)))
-    config_path = "/home/cathy/projectCathy/env2/config.ini"
+if os_name == "Linux":# ubuntu and Rasbian
+    CDLL(str(Path("/home/cathy/projectCathy/env2/libonnxruntime.so.1.13.1").resolve(strict=True)))
     open_jtalk_path ="/home/cathy/projectCathy/env2/open_jtalk_dic_utf_8-1.11"
 
 elif os_name == "Windows":
 
     if os_info =="Windows-10-10.0.22621-SP0":# win11
         CDLL(str(Path("C:/GitHub/projectCathy/env2/main/onnxruntime.dll").resolve(strict=True)))
-        config_path = "C:/GitHub/projectCathy/env1/main/config.ini"
         open_jtalk_path ="C:/GitHub/projectCathy/env2/main/open_jtalk_dic_utf_8-1.11"
 
     elif os_info=="Windows-11-10.0.17763-SP0":# win10
         CDLL(str(Path("X:/venv/env/onnxruntime.dll").resolve(strict=True)))
-        config_path = "X:/venv/env/config.ini"
         open_jtalk_path ="X:/venv/env/open_jtalk_dic_utf_7-1.11"
 
     else:
-        print("想定外のOSエラー")
+        print("新しい環境エラー")
         CDLL(str(Path("onnxruntime.dll").resolve(strict=True)))
         os_info = "null"
-        config_path = "null"
         open_jtalk_path = "null"
 
 from googletrans import Translator
@@ -250,19 +246,14 @@ class runtime_serial():
         def __init__(self, clock, cnt):
             self.cnt = cnt
             self.clock = clock
-            if os_name == "linux":
-                ser = serial.Serial('/dev/serial0', 115200, timeout = 1.0)
-
-            elif os_name =="Windows":
-                ser ="null"
-                # time.sleep(clock)
-                # print(f"{clock}s経過しました")
-            
-            runtime_serial.signal(self, ser)
+            runtime_serial.signal(self)
+            # time.sleep(clock)
+            # print(f"{clock}s経過しました")
 
 
-        def signal(self, ser):
-            if ser != "null":    
+        def signal(self):
+            ser = serial.Serial('/dev/serial0', 115200, timeout = 1.0)
+            if os_name == "Linux":    
                 if self.cnt == 0:
                     # 信号をESP32に送信
                     play_signal = "A"
