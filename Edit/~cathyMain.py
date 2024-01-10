@@ -274,7 +274,4 @@ class runtime_serial():
                     print("【デバック】Bシグナルを送信した体。再生を終了します")
 
 
-
-
-if __name__ =='__main__':
     cathy_Main()
