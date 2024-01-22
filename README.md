@@ -1,7 +1,9 @@
 # Cathy
 
-# 概要
+# はじめに
 初めてのGitなんでお試し  
+がむしゃらに書かれたPythonコード
+# したいこと
 ChatGPTとVOICEVOXを活用した対象者の状態記録の自動化・伝達。
 
 このレポジトリは以下のフローを達成するためのレポジトリ。  
@@ -43,8 +45,10 @@ pip install pyaudio
 pip install wave  
 
 # プログラムのファイル名称について  
+Editディレクトリにあるプログラムは開発版
 先端に「hello」とついているのは機能の動作テストプログラム  
 先端に「example」とついているのはPythonやライブラリの文法チェック用のファイル  
 ## cathyMain.pyについて  
-cathyMain.pyがcathyの本体のソースコードで、コミュニケーションの機能はこのファイルに最終的に集約される  
-開発の流れとして、「hello」や「example」で機能を一つ一つテストしていき、要件を満たすことができたプログラムをcathyMain.pyに実装される
+cathyMain.pyがCathyのコミュニケーション機能のソースコード  
+## cathyEye.pyについて  
+cathyEye.pyがCathyの計測結果の自動記録のソースコード
