@@ -250,6 +250,14 @@ class runtime_serial():
             # time.sleep(clock)
             # print(f"{clock}s経過しました")
 
+            if os_name == "linux":
+                ser = serial.Serial('/dev/serial0', 115200, timeout = 1.0)
+
+            elif os_name =="Windows":
+                ser ="null"
+            
+            runtime_serial.signal(self, ser)
+
 
         def signal(self):
             ser = serial.Serial('/dev/serial0', 115200, timeout = 1.0)
@@ -274,4 +282,4 @@ class runtime_serial():
                     print("【デバック】Bシグナルを送信した体。再生を終了します")
 
 
-    cathy_Main()
+cathy_Main()
